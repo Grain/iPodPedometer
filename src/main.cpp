@@ -22,7 +22,7 @@ int main()
                 case sf::Event::Closed:
                     window.close();
                     break;
-                case sf::Event::KeyPressed:
+                case sf::Event::KeyPressed: //for debugging
                     if (event.key.code == sf::Keyboard::Key::Left)
                     {
                         calendar.previousMonth();
@@ -31,10 +31,16 @@ int main()
                     {
                         calendar.nextMonth();
                     }
+                    if (event.key.code == sf::Keyboard::Key::Up)
+                    {
+                        std::cout << calendar.getSelectedDate() << std::endl;
+                    }
                 default:
                     break;
             }
         }
+        calendar.selectPoint(sf::Mouse::getPosition(window));
+
         window.clear(sf::Color::White);
 
         calendar.draw(&window);

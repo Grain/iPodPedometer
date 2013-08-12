@@ -25,7 +25,18 @@ Calendar::~Calendar()
 }
 
 //getters
+boost::gregorian::date Calendar::getSelectedDate()
+{
+    if (showSelected)
+    {
+        if (selected >= 7 && selected < COLUMNS * (ROWS - 1))
+        {
+            return currentMonth - boost::gregorian::days(firstDay - selected);
+        }
+    }
 
+    return boost::gregorian::date(boost::gregorian::not_a_date_time);
+}
 
 //setters
 
@@ -60,10 +71,10 @@ void Calendar::setYearMonth(boost::gregorian::greg_year year, boost::gregorian::
 
     for (int i = 0; i < COLUMNS * (ROWS - 1); ++i)
     {
-        days[i].setPosition(sf::Vector2f(position.x + (i % 7) * WIDTH + WIDTH / 2, position.y + (i / 7 + 1) * HEIGHT + HEIGHT / 2));
+        days[i].setPosition(sf::Vector2f(position.x + (i % COLUMNS) * WIDTH + WIDTH / 2, position.y + (i / COLUMNS + 1) * HEIGHT + HEIGHT / 2));
         days[i].setCharacterSize(12);
         days[i].setStyle(sf::Text::Regular);
-        if (i < 7)
+        if (i < COLUMNS)
         {
             std::stringstream temp;
             temp << (tempDay + boost::gregorian::days(i)).day_of_week();
@@ -79,6 +90,8 @@ void Calendar::setYearMonth(boost::gregorian::greg_year year, boost::gregorian::
                 if (calculatePrev(i) == -1)
                 {
                     currentCount = 1;   //done displaying last month
+                    firstDay = i;
+                    printf("%d\n", i);
                 }
                 else    //display last month
                 {
@@ -119,33 +132,20 @@ void Calendar::setYearMonth(boost::gregorian::greg_year year, boost::gregorian::
 
         days[i].setOrigin(sf::Vector2f(days[i].getGlobalBounds().width / 2, days[i].getGlobalBounds().height / 2));
     }
+
+    //month and year
+    title.setCharacterSize(12);
+    title.setColor(sf::Color::Black);
+    title.setPosition(sf::Vector2f(position.x + (WIDTH * COLUMNS) / 2, position.y + HEIGHT / 2));
+
+    std::stringstream temp;
+    temp << currentMonth.month() << " " << currentMonth.year();
+    title.setString(temp.str());
+
+    title.setOrigin(sf::Vector2f(title.getGlobalBounds().width / 2, title.getGlobalBounds().height / 2));
 }
 
 //functions
-
-void Calendar::nextMonth()
-{
-    if (currentMonth.month() == 12)
-    {
-        setYearMonth(currentMonth.year() + 1, 1);
-    }
-    else
-    {
-        setYearMonth(currentMonth.year(), currentMonth.month() + 1);
-    }
-}
-
-void Calendar::previousMonth()
-{
-    if (currentMonth.month() == 1)
-    {
-        setYearMonth(currentMonth.year() - 1, 12);
-    }
-    else
-    {
-        setYearMonth(currentMonth.year(), currentMonth.month() - 1);
-    }
-}
 
 int Calendar::calculatePrev(int i)
 {
@@ -178,7 +178,21 @@ void Calendar::initialize()
     position = sf::Vector2f(100, 100);
     firstDayOfWeek = 0;
 
+    firstDay = 0;
+    selected = 0;
+
+    showSelected = true;
+
+    selectedBox.setSize(sf::Vector2f(WIDTH, HEIGHT));
+    selectedBox.setFillColor(sf::Color::Red);
+
+    background.setSize(sf::Vector2f(WIDTH * COLUMNS + 1, HEIGHT * ROWS + 1));
+    background.setPosition(position);
+    background.setFillColor(sf::Color(255, 255, 255, 128));
+
     font.loadFromFile("arial.ttf");
+
+    title.setFont(font);
 
     for (int i = 0; i < COLUMNS * (ROWS - 1); ++i)
     {
@@ -186,8 +200,42 @@ void Calendar::initialize()
     }
 }
 
+void Calendar::nextMonth()
+{
+    if (currentMonth.month() == 12)
+    {
+        setYearMonth(currentMonth.year() + 1, 1);
+    }
+    else
+    {
+        setYearMonth(currentMonth.year(), currentMonth.month() + 1);
+    }
+}
+
+void Calendar::previousMonth()
+{
+    if (currentMonth.month() == 1)
+    {
+        setYearMonth(currentMonth.year() - 1, 12);
+    }
+    else
+    {
+        setYearMonth(currentMonth.year(), currentMonth.month() - 1);
+    }
+}
+
 void Calendar::draw(sf::RenderTarget * target)
 {
+    target->draw(background);
+
+    if (showSelected)
+    {
+        if (selected >= 7 && selected < COLUMNS * (ROWS - 1))
+        {
+            target->draw(selectedBox);
+        }
+    }
+
     sf::RectangleShape line;
     line.setFillColor(sf::Color::Black);
 
@@ -195,12 +243,12 @@ void Calendar::draw(sf::RenderTarget * target)
     {
         if (a == 0 || a == COLUMNS)
         {
-            line.setSize(sf::Vector2f(1, (float)(ROWS * HEIGHT)));
+            line.setSize(sf::Vector2f(1, (float)(ROWS * HEIGHT + 1)));
             line.setPosition(sf::Vector2f(position.x + a * WIDTH, position.y));
         }
         else
         {
-            line.setSize(sf::Vector2f(1, (float)((ROWS - 1) * HEIGHT)));
+            line.setSize(sf::Vector2f(1, (float)((ROWS - 1) * HEIGHT + 1)));
             line.setPosition(sf::Vector2f(position.x + a * WIDTH, position.y + HEIGHT));
         }
 
@@ -209,7 +257,7 @@ void Calendar::draw(sf::RenderTarget * target)
 
     for(int a = 0; a <= ROWS; ++a)
     {
-        line.setSize(sf::Vector2f{(float)(COLUMNS * WIDTH), 1});
+        line.setSize(sf::Vector2f{(float)(COLUMNS * WIDTH + 1), 1});
         line.setPosition(sf::Vector2f(position.x, position.y + a * HEIGHT));
         target->draw(line);
     }
@@ -219,5 +267,18 @@ void Calendar::draw(sf::RenderTarget * target)
         target->draw(days[i]);
     }
 
-    std::cout << currentMonth << std::endl;
+    target->draw(title);
+}
+
+void Calendar::selectPoint(sf::Vector2i point)
+{
+    sf::Vector2f relativePoint = (sf::Vector2f)point - position;
+    if (relativePoint.x <= 0 || relativePoint.x >= WIDTH * COLUMNS || relativePoint.y <= 0 || relativePoint.y >= HEIGHT * ROWS)
+    {
+        selected = 0;
+        return;
+    }
+
+    selected = (((int)relativePoint.y - HEIGHT) / HEIGHT) * COLUMNS + relativePoint.x / WIDTH;
+    selectedBox.setPosition(sf::Vector2f(position.x + (selected % COLUMNS) * WIDTH, position.y + (selected / COLUMNS + 1) * HEIGHT));
 }

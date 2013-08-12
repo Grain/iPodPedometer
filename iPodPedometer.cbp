@@ -35,12 +35,11 @@
 			<Add option="-Iinclude" />
 			<Add option="-DSFML_STATIC" />
 			<Add directory="D:/SFML-2.0/include" />
-			<Add directory="D:/boost_1_54_0" />
+			<Add directory="D:/boost_1_54_0/include" />
 		</Compiler>
 		<Linker>
 			<Add option="-lsfml-graphics-s" />
 			<Add option="-lsfml-window-s" />
-			<Add option="-lsfml-network-s" />
 			<Add option="-lsfml-system-s" />
 			<Add option="-static" />
 			<Add directory="D:/SFML-2.0/lib" />
