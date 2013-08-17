@@ -38,6 +38,26 @@ boost::gregorian::date Calendar::getSelectedDate()
     return boost::gregorian::date(boost::gregorian::not_a_date_time);
 }
 
+short Calendar::getFirstDayOfWeek()
+{
+    return firstDayOfWeek;
+}
+
+sf::Color Calendar::getBackgroundColor()
+{
+    return backgroundColor;
+}
+
+sf::Color Calendar::getForegroundColor()
+{
+    return foregroundColor;
+}
+
+sf::Color Calendar::getSelectedColor()
+{
+    return selectedColor;
+}
+
 //setters
 
 void Calendar::setYearMonth(boost::gregorian::greg_year year, boost::gregorian::greg_month month)
@@ -79,7 +99,7 @@ void Calendar::setYearMonth(boost::gregorian::greg_year year, boost::gregorian::
             std::stringstream temp;
             temp << (tempDay + boost::gregorian::days(i)).day_of_week();
 
-            days[i].setColor(sf::Color::Black);
+            days[i].setColor(foregroundColor);
             days[i].setString(temp.str());
         }
 
@@ -106,7 +126,7 @@ void Calendar::setYearMonth(boost::gregorian::greg_year year, boost::gregorian::
             {
                 if (nextCount == 0) //display this month
                 {
-                    days[i].setColor(sf::Color::Black);
+                    days[i].setColor(foregroundColor);
                     char temp[20];
                     sprintf(temp, "%d", currentCount);
                     days[i].setString(temp);
@@ -135,7 +155,7 @@ void Calendar::setYearMonth(boost::gregorian::greg_year year, boost::gregorian::
 
     //month and year
     title.setCharacterSize(12);
-    title.setColor(sf::Color::Black);
+    title.setColor(foregroundColor);
     title.setPosition(sf::Vector2f(position.x + (WIDTH * COLUMNS) / 2, position.y + HEIGHT / 2));
 
     std::stringstream temp;
@@ -143,6 +163,29 @@ void Calendar::setYearMonth(boost::gregorian::greg_year year, boost::gregorian::
     title.setString(temp.str());
 
     title.setOrigin(sf::Vector2f(title.getGlobalBounds().width / 2, title.getGlobalBounds().height / 2));
+}
+
+void Calendar::setFirstDayOfWeek(short i)
+{
+    firstDayOfWeek = i;
+}
+
+void Calendar::setBackgroundColor(sf::Color i)
+{
+    backgroundColor = i;
+    background.setFillColor(i);
+}
+
+void Calendar::setForegroundColor(sf::Color i)
+{
+    foregroundColor = i;
+    setYearMonth(currentMonth.year(), currentMonth.month());
+}
+
+void Calendar::setSelectedColor(sf::Color i)
+{
+    selectedColor = i;
+    selectedBox.setFillColor(i);
 }
 
 //functions
@@ -237,7 +280,7 @@ void Calendar::draw(sf::RenderTarget * target)
     }
 
     sf::RectangleShape line;
-    line.setFillColor(sf::Color::Black);
+    line.setFillColor(foregroundColor);
 
     for(int a = 0; a <= COLUMNS; ++a)
     {

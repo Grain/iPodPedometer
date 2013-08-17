@@ -14,8 +14,16 @@ class Calendar
         virtual ~Calendar();
         //getters
         boost::gregorian::date getSelectedDate();
+        short getFirstDayOfWeek();
+        sf::Color getBackgroundColor();
+        sf::Color getForegroundColor();
+        sf::Color getSelectedColor();
         //setters
         void setYearMonth(boost::gregorian::greg_year, boost::gregorian::greg_month);
+        void setFirstDayOfWeek(short);
+        void setBackgroundColor(sf::Color);
+        void setForegroundColor(sf::Color);
+        void setSelectedColor(sf::Color);
         //functions
         void draw(sf::RenderTarget*);
         void nextMonth();
@@ -40,6 +48,10 @@ class Calendar
         sf::Text days[COLUMNS * (ROWS - 1)];
         sf::RectangleShape background;
         sf::RectangleShape selectedBox;
+
+        sf::Color backgroundColor;
+        sf::Color foregroundColor;
+        sf::Color selectedColor;
 
         boost::gregorian::date currentMonth;
         boost::gregorian::date today;
