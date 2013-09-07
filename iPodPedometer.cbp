@@ -41,8 +41,12 @@
 			<Add option="-lsfml-graphics-s" />
 			<Add option="-lsfml-window-s" />
 			<Add option="-lsfml-system-s" />
+			<Add option="-lboost_system.dll" />
+			<Add option="-lboost_filesystem.dll" />
+			<Add option="-lboost_date_time.dll" />
 			<Add option="-static" />
 			<Add directory="D:/SFML-2.0/lib" />
+			<Add directory="D:/boost_1_54_0/lib" />
 		</Linker>
 		<Unit filename="include/calendar.h" />
 		<Unit filename="src/calendar.cpp" />

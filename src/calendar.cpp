@@ -111,7 +111,7 @@ void Calendar::setYearMonth(boost::gregorian::greg_year year, boost::gregorian::
                 {
                     currentCount = 1;   //done displaying last month
                     firstDay = i;
-                    printf("%d\n", i);
+                    //printf("%d\n", i);
                 }
                 else    //display last month
                 {
