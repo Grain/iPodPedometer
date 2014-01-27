@@ -20,7 +20,7 @@ void addRecord(boost::gregorian::date day, int steps)
         if (records[i].first == day)
         {
             records[i].second += steps;
-            break;
+            return;
         }
     }
 
@@ -29,9 +29,29 @@ void addRecord(boost::gregorian::date day, int steps)
 
 int main(int argc, char* argv[])
 {
+//    boost::filesystem::path path("G:/iPod_Control/Device/Trainer/Workouts/Empeds/pedometer");
+//    boost::filesystem::path path("E:/pedometer");
+    boost::filesystem::path path;
+
+    if (argc > 2 && std::string(argv[1]) == "-i")
+    {
+        path = boost::filesystem::path(std::string(argv[2]) + "/iPod_Control/Device/Trainer/Workouts/Empeds/pedometer");
+    }
+    else if (argc > 2 && std::string(argv[1]) == "-d")
+    {
+        path = boost::filesystem::path(std::string(argv[2]));
+    }
+    else
+    {
+        std::cout << "Use the -i [DIR] argument to supply the location of the iPod." << std::endl;
+        std::cout << "Use the -d [DIR] to supply the location of the pedometer directory." << std::endl;
+        std::cout << "Press the enter key to exist.";
+        std::cin.get();
+        exit(0);
+    }
+
     Calendar calendar;
 
-    boost::filesystem::path path("G:/iPod_Control/Device/Trainer/Workouts/Empeds/pedometer");
     boost::filesystem::recursive_directory_iterator pathIterator(path);
 
     while (pathIterator != boost::filesystem::recursive_directory_iterator())
@@ -105,9 +125,12 @@ int main(int argc, char* argv[])
             switch (event.type)
             {
                 case sf::Event::Closed:
+                {
                     window.close();
                     break;
+                }
                 case sf::Event::KeyPressed: //for debugging
+                {
                     if (event.key.code == sf::Keyboard::Key::Left)
                     {
                         calendar.previousMonth();
@@ -143,8 +166,11 @@ int main(int argc, char* argv[])
                             std::cout << "nothing that day" << std::endl;
                         }
                     }
+                }
                 default:
+                {
                     break;
+                }
             }
         }
         calendar.selectPoint(sf::Mouse::getPosition(window));
