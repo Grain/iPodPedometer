@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
     {
         std::cout << "Use the -i [DIR] argument to supply the location of the iPod." << std::endl;
         std::cout << "Use the -d [DIR] to supply the location of the pedometer directory." << std::endl;
-        std::cout << "Press the enter key to exist.";
+        std::cout << "Press the enter key to exit.";
         std::cin.get();
         exit(0);
     }
